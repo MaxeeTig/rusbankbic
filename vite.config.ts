@@ -2,9 +2,26 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
+  import fs from 'fs';
+
+  // Plugin to rename index.html to app.html after build
+  const renameHtmlPlugin = () => {
+    return {
+      name: 'rename-html',
+      closeBundle() {
+        const buildDir = path.resolve(__dirname, 'build');
+        const indexHtmlPath = path.join(buildDir, 'index.html');
+        const appHtmlPath = path.join(buildDir, 'app.html');
+        
+        if (fs.existsSync(indexHtmlPath)) {
+          fs.renameSync(indexHtmlPath, appHtmlPath);
+        }
+      },
+    };
+  };
 
   export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), renameHtmlPlugin()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
